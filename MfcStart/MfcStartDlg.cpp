@@ -76,6 +76,10 @@ BEGIN_MESSAGE_MAP(CMfcStartDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_TEST, &CMfcStartDlg::OnBnClickedBtnTest)
 	ON_EN_CHANGE(IDC_EDIT_NUM1, &CMfcStartDlg::OnEnChangeEditNum1)
 	ON_EN_CHANGE(IDC_EDIT_NUM2, &CMfcStartDlg::OnEnChangeEditNum2)
+	ON_BN_CLICKED(IDC_BNT_IMAGE, &CMfcStartDlg::OnBnClickedBntImage)
+	ON_BN_CLICKED(IDC_BTN_SAVE, &CMfcStartDlg::OnBnClickedBtnSave)
+	ON_BN_CLICKED(IDC_BTN_LOAD, &CMfcStartDlg::OnBnClickedBtnLoad)
+	ON_BN_CLICKED(IDC_BTN_ACTION, &CMfcStartDlg::OnBnClickedBtnAction)
 END_MESSAGE_MAP()
 
 
@@ -215,4 +219,197 @@ void CMfcStartDlg::OnEnChangeEditNum1()
 	// 이 알림 메시지를 보내지 않습니다.
 
 	// TODO:  여기에 컨트롤 알림 처리기 코드를 추가합니다.
+}
+
+
+void CMfcStartDlg::OnBnClickedBntImage()
+{
+	int nWidth = 320;
+	int nHeight = 240;
+	int nBpp = 8;
+
+	//이미지 생성
+	if(m_image== NULL)
+		m_image.Create(nWidth, nHeight, nBpp);
+	//8bit 이미지에 대한 흑백설정
+	if (nBpp == 8) {
+		static RGBQUAD rgb[256];
+		for (int i = 0; i < 256; i++)
+			rgb[i].rgbRed = rgb[i].rgbBlue = rgb[i].rgbGreen = i;
+		m_image.SetColorTable(0, 256, rgb);
+	}
+
+	int nPitch = m_image.GetPitch();	//이미지의 개별 픽셀을 찾는 데 사용
+	unsigned char* fm = (unsigned char*)m_image.GetBits();	//비트맵에 지정된 실제 비트값에 대한 포인터
+
+	//memset(fm, 0xff, nWidth * nHeight);
+	for (int j = 0; j < nHeight; j++)
+	{
+		for (int i = 0; i < nWidth; i++)
+		{
+			fm[j *nPitch + i] = j; 
+		}
+	}
+
+	//동그라미 출력  (x - a)2 + (y - b)2 = r2
+	int nCenterX=320, nCenterY=0, r=30;
+	for (int j = -r; j < +r; j++)
+	{
+		for (int i = -r; i < +r; i++)
+		{
+			int nPx = nCenterX + i;
+			int nPy = nCenterY + j;
+			//if(pow(nPx-nCenterX,2)+pow(nPy-nCenterY,2) < pow(r, 2))
+			if(ValidInCirclePos(nCenterX, nCenterY, nPx, nPy, r))
+			{ 
+				fm[(nCenterY + j) * nPitch + (nCenterX + i)] = 150;
+			}
+			
+		}
+	}
+
+
+
+
+	//이미지 드로우
+	CClientDC dc(this);
+	UpdateDisplay();
+}
+
+CString g_strFileImage = _T("./image.bmp");
+void CMfcStartDlg::OnBnClickedBtnSave()
+{
+	m_image.Save(g_strFileImage);
+}
+
+
+void CMfcStartDlg::OnBnClickedBtnLoad()
+{
+	if (m_image != NULL)
+		m_image.Destroy();
+	m_image.Load(g_strFileImage);
+
+	UpdateDisplay();
+}
+
+void CMfcStartDlg::UpdateDisplay()
+{
+	//이미지 드로우
+	CClientDC dc(this);
+	m_image.Draw(dc, 10, 240 / 2);
+}
+
+void CMfcStartDlg::MoveRect()
+{
+	static int nSttX = 0;
+	static int nSttY = 0;
+	if (m_image == NULL)
+		return;
+	int nBoxColor = 255;
+	int nWidth = m_image.GetWidth();
+	int nHeight = m_image.GetHeight();
+	int nBpp = m_image.GetPitch();
+
+	//이미지 생성
+	if (m_image == NULL)
+		m_image.Create(nWidth, nHeight, nBpp);
+	//8bit 이미지에 대한 흑백설정
+	if (nBpp == 8) {
+		static RGBQUAD rgb[256];
+		for (int i = 0; i < 256; i++)
+			rgb[i].rgbRed = rgb[i].rgbBlue = rgb[i].rgbGreen = i;
+		m_image.SetColorTable(0, 256, rgb);
+	}
+	
+	int nPitch = m_image.GetPitch();	//이미지의 개별 픽셀을 찾는 데 사용
+	unsigned char* fm = (unsigned char*)m_image.GetBits();	//비트맵에 지정된 실제 비트값에 대한 포인터
+
+	//memset(fm, 0xff, nWidth * nHeight);
+	for (int j = 0; j < nHeight; j++)
+	{
+		for (int i = 0; i < nWidth; i++)
+		{
+			fm[j * nPitch + i] = j;
+		}
+	}
+	//이미지에 box그림그리기
+	for (int j = 5+ nSttY; j < nSttY+50; j++)
+	{
+		for (int i = 5+ nSttX; i < nSttX+30; i++) {
+			if(ValidImgPos(i, j))
+				fm[j * nPitch + i] = nBoxColor;
+		}
+	}
+	nSttX++;
+	nSttY++;
+	UpdateDisplay();
+}
+void CMfcStartDlg::MoveCircle()
+{
+	static int nCenterX = 320;
+	static int nCenterY = 0;
+
+	if (m_image == NULL)
+		return;
+	int nBoxColor = 255;
+	int nWidth = m_image.GetWidth();
+	int nHeight = m_image.GetHeight();
+	int nBpp = m_image.GetPitch();
+
+	int nPitch = m_image.GetPitch();	//이미지의 개별 픽셀을 찾는 데 사용
+	unsigned char* fm = (unsigned char*)m_image.GetBits();	//비트맵에 지정된 실제 비트값에 대한 포인터
+
+	//동그라미 출력  (x - a)2 + (y - b)2 = r2
+	int r = 30;
+	for (int j = -r; j < +r; j++)
+	{
+		for (int i = -r; i < +r; i++)
+		{
+			int nPx = nCenterX + i;
+			int nPy = nCenterY + j;
+			//if(pow(nPx-nCenterX,2)+pow(nPy-nCenterY,2) < pow(r, 2))
+			if (ValidInCirclePos(nCenterX, nCenterY, nPx, nPy, r))
+			{
+				fm[(nCenterY + j) * nPitch + (nCenterX + i)] = 150;
+			}
+
+		}
+	}
+	
+	nCenterX--;
+	nCenterY++;
+	UpdateDisplay();
+}
+
+
+void CMfcStartDlg::OnBnClickedBtnAction()
+{
+	for (size_t i = 0; i < 100; i++)
+	{
+		MoveRect();
+		MoveCircle();
+		//딜레이 Sleep 함수 사용
+		Sleep(10);
+	}
+}
+
+BOOL CMfcStartDlg::ValidImgPos(int x, int y)
+{
+	int nWidth = m_image.GetWidth();
+	int nHeight = m_image.GetHeight();
+	CRect rect(0, 0, nWidth, nHeight);
+
+	return rect.PtInRect(CPoint(x, y));
+}
+
+BOOL CMfcStartDlg::ValidInCirclePos(int x, int y, int p1, int p2, int r) {
+	int nWidth = m_image.GetWidth();
+	int nHeight = m_image.GetHeight();
+	//밖으로 나갔을 때 처리
+	if (p1 < 0 || p2 < 0 || p1 >= nWidth || p2 >= nHeight)
+		return false;
+	
+	if (pow(p1 - x, 2) + pow(p2 - y, 2) < pow(r, 2))
+		return true;
+	return false;
 }

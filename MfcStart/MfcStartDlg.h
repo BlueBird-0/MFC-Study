@@ -8,6 +8,10 @@
 // CMfcStartDlg 대화 상자
 class CMfcStartDlg : public CDialogEx
 {
+private :
+	CImage m_image;
+	BOOL ValidImgPos(int x, int y);
+	BOOL ValidInCirclePos(int x, int y, int p1, int p2, int r);
 // 생성입니다.
 public:
 	CMfcStartDlg(CWnd* pParent = nullptr);	// 표준 생성자입니다.
@@ -39,4 +43,11 @@ public:
 	afx_msg void OnEnChangeEditNum();
 	afx_msg void OnEnChangeEditNum2();
 	afx_msg void OnEnChangeEditNum1();
+	afx_msg void OnBnClickedBntImage();
+	afx_msg void OnBnClickedBtnSave();
+	afx_msg void OnBnClickedBtnLoad();
+	void UpdateDisplay();
+	void MoveRect();
+	void MoveCircle();
+	afx_msg void OnBnClickedBtnAction();
 };
