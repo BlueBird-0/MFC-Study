@@ -224,12 +224,19 @@ void CMfcStartDlg::OnEnChangeEditNum1()
 
 void CMfcStartDlg::OnBnClickedBntImage()
 {
-	int nWidth = 320;
-	int nHeight = 240;
-	int nBpp = 8;
 
+	InitImageDC(320, 240, 8);	
+	DrawBackground();
+
+	//최초 이미지 드로우
+	CClientDC dc(this);
+	UpdateDisplay();
+}
+
+void CMfcStartDlg::InitImageDC(int nWidth, int nHeight, int nBpp)
+{
 	//이미지 생성
-	if(m_image== NULL)
+	if (m_image == NULL)
 		m_image.Create(nWidth, nHeight, nBpp);
 	//8bit 이미지에 대한 흑백설정
 	if (nBpp == 8) {
@@ -238,42 +245,23 @@ void CMfcStartDlg::OnBnClickedBntImage()
 			rgb[i].rgbRed = rgb[i].rgbBlue = rgb[i].rgbGreen = i;
 		m_image.SetColorTable(0, 256, rgb);
 	}
+}
 
-	int nPitch = m_image.GetPitch();	//이미지의 개별 픽셀을 찾는 데 사용
+void CMfcStartDlg::DrawBackground()
+{
 	unsigned char* fm = (unsigned char*)m_image.GetBits();	//비트맵에 지정된 실제 비트값에 대한 포인터
-
+	//배경 그라디언트
+	int nWidth = m_image.GetWidth();
+	int nHeight = m_image.GetHeight(); 
+	int nPitch = m_image.GetPitch();
 	//memset(fm, 0xff, nWidth * nHeight);
 	for (int j = 0; j < nHeight; j++)
 	{
 		for (int i = 0; i < nWidth; i++)
 		{
-			fm[j *nPitch + i] = j; 
+			fm[j * nPitch + i] = j;
 		}
 	}
-
-	//동그라미 출력  (x - a)2 + (y - b)2 = r2
-	int nCenterX=320, nCenterY=0, r=30;
-	for (int j = -r; j < +r; j++)
-	{
-		for (int i = -r; i < +r; i++)
-		{
-			int nPx = nCenterX + i;
-			int nPy = nCenterY + j;
-			//if(pow(nPx-nCenterX,2)+pow(nPy-nCenterY,2) < pow(r, 2))
-			if(ValidInCirclePos(nCenterX, nCenterY, nPx, nPy, r))
-			{ 
-				fm[(nCenterY + j) * nPitch + (nCenterX + i)] = 150;
-			}
-			
-		}
-	}
-
-
-
-
-	//이미지 드로우
-	CClientDC dc(this);
-	UpdateDisplay();
 }
 
 CString g_strFileImage = _T("./image.bmp");
@@ -380,7 +368,6 @@ void CMfcStartDlg::MoveCircle()
 	nCenterY++;
 	UpdateDisplay();
 }
-
 
 void CMfcStartDlg::OnBnClickedBtnAction()
 {

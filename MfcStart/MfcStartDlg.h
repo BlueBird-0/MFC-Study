@@ -49,5 +49,7 @@ public:
 	void UpdateDisplay();
 	void MoveRect();
 	void MoveCircle();
+	void InitImageDC(int nWidth, int nHeight, int nBpp );
 	afx_msg void OnBnClickedBtnAction();
+	void DrawBackground();
 };
