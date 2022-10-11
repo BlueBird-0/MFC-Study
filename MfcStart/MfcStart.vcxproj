@@ -207,7 +207,10 @@
     <None Include="res\MfcStart.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\image\background.png" />
     <Image Include="res\MfcStart.ico" />
+    <Image Include="res\off.bmp" />
+    <Image Include="res\on.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

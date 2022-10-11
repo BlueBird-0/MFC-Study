@@ -24,6 +24,9 @@ public:
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 지원입니다.
 
+private:
+	CBitmapButton* m_pBtnOnOff;
+	void initButtons();
 
 // 구현입니다.
 protected:
@@ -52,4 +55,7 @@ public:
 	void InitImageDC(int nWidth, int nHeight, int nBpp );
 	afx_msg void OnBnClickedBtnAction();
 	void DrawBackground();
+	afx_msg void OnBnClickedBtnOnoff();
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+	afx_msg void OnDestroy();
 };

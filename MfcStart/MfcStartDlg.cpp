@@ -80,6 +80,9 @@ BEGIN_MESSAGE_MAP(CMfcStartDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_SAVE, &CMfcStartDlg::OnBnClickedBtnSave)
 	ON_BN_CLICKED(IDC_BTN_LOAD, &CMfcStartDlg::OnBnClickedBtnLoad)
 	ON_BN_CLICKED(IDC_BTN_ACTION, &CMfcStartDlg::OnBnClickedBtnAction)
+	ON_BN_CLICKED(IDC_BTN_ONOFF, &CMfcStartDlg::OnBnClickedBtnOnoff)
+	ON_WM_ERASEBKGND()
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -116,6 +119,8 @@ BOOL CMfcStartDlg::OnInitDialog()
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
 	SetDlgItemText(IDC_STATIC_RESULT, _T("0"));
+	
+	initButtons();
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -399,4 +404,64 @@ BOOL CMfcStartDlg::ValidInCirclePos(int x, int y, int p1, int p2, int r) {
 	if (pow(p1 - x, 2) + pow(p2 - y, 2) < pow(r, 2))
 		return true;
 	return false;
+}
+
+void CMfcStartDlg::OnBnClickedBtnOnoff()
+{
+	//버튼 이미지 토글
+	static bool bOn = false;
+	if (bOn) {
+		m_pBtnOnOff->LoadBitmaps(IDB_ON);
+	}
+	else {
+		m_pBtnOnOff->LoadBitmaps(IDB_OFF);
+	}
+	bOn = !bOn;
+}
+
+
+BOOL CMfcStartDlg::OnEraseBkgnd(CDC* pDC)
+{
+	//클라이언트DC를 얻어와, 색칠하는 방법
+	CRect rc;
+	GetClientRect(rc);
+	pDC->FillSolidRect(rc, RGB(25, 32, 40));
+	return TRUE;
+
+
+	//비트맵 이미지로 배경을 처리하는 방법
+	/*CPngImage image; 
+	image.Load(IDB_BASE, nullptr);
+
+	CDC dc;
+	dc.CreateCompatibleDC(pDC);
+	CBitmap* pOldBitmap = dc.SelectObject(&image);
+
+	pDC->BitBlt(0,0, 800, 800, &dc, 0,0, SRCCOPY);
+	dc.SelectObject(pOldBitmap);
+	return TRUE;*/
+
+	
+	return CDialogEx::OnEraseBkgnd(pDC);
+}
+
+
+void CMfcStartDlg::initButtons()
+{
+	//bitmap버튼 추가
+	CRect rect(0, 0, 200, 50);
+	GetDlgItem(IDC_BTN_ONOFF)->GetClientRect(&rect);
+	m_pBtnOnOff = new CBitmapButton;	//메모리 할당 시 해제 필 
+	m_pBtnOnOff->Create(NULL, WS_CHILD | WS_VISIBLE | BS_OWNERDRAW, rect, this, IDC_BTN_ONOFF);
+	m_pBtnOnOff->LoadBitmaps(IDB_ON, IDB_OFF);
+	m_pBtnOnOff->SizeToContent();
+}
+
+void CMfcStartDlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	//메모리 해제
+	if (m_pBtnOnOff != NULL)
+		delete m_pBtnOnOff;
 }
