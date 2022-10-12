@@ -83,6 +83,7 @@ BEGIN_MESSAGE_MAP(CMfcStartDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_ONOFF, &CMfcStartDlg::OnBnClickedBtnOnoff)
 	ON_WM_ERASEBKGND()
 	ON_WM_DESTROY()
+	ON_BN_CLICKED(IDC_BTN_MODAL, &CMfcStartDlg::OnBnClickedBtnModal)
 END_MESSAGE_MAP()
 
 
@@ -119,8 +120,9 @@ BOOL CMfcStartDlg::OnInitDialog()
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
 	SetDlgItemText(IDC_STATIC_RESULT, _T("0"));
-	
-	initButtons();
+	m_pDlgImage = new CDlgImage;	//메모리 해제 필요
+	m_pDlgImage->Create(IDD_CDLGIMAGE, this);
+	m_pDlgImage->ShowWindow(SW_SHOW);
 
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
@@ -464,4 +466,20 @@ void CMfcStartDlg::OnDestroy()
 	//메모리 해제
 	if (m_pBtnOnOff != NULL)
 		delete m_pBtnOnOff;
+	if (m_pDlgImage != NULL)
+		delete m_pDlgImage;
+}
+
+
+void CMfcStartDlg::OnBnClickedBtnModal()
+{
+	m_pDlgImage->ShowWindow(SW_SHOW);
+}
+
+
+//모달간 데이터 전송 코드
+void CMfcStartDlg::CallFunction(int n)
+{
+	int nData = n;
+	cout << "modal called data : " << nData << endl;
 }
