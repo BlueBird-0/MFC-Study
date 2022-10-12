@@ -16,8 +16,11 @@ private :
 // 생성입니다.
 public:
 	CMfcStartDlg(CWnd* pParent = nullptr);	// 표준 생성자입니다.
+	CDC m_MemDC;
+	CDC m_cDC;
 	
 	CDlgImage* m_pDlgImage;
+	CDlgImage* m_pDlgImageResult;
 
 
 // 대화 상자 데이터입니다.
@@ -39,7 +42,6 @@ protected:
 	// 생성된 메시지 맵 함수
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
-	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
@@ -64,4 +66,5 @@ public:
 	afx_msg void OnDestroy();
 	afx_msg void OnBnClickedBtnModal();
 	void CallFunction(int n);
+	afx_msg void OnBnClickedModalTest();
 };

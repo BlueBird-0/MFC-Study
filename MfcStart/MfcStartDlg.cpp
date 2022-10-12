@@ -35,6 +35,7 @@ public:
 // 구현입니다.
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
 };
 
 CAboutDlg::CAboutDlg() : CDialogEx(IDD_ABOUTBOX)
@@ -47,6 +48,7 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 }
 
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
+//	ON_WM_CREATE()
 END_MESSAGE_MAP()
 
 
@@ -71,7 +73,7 @@ void CMfcStartDlg::DoDataExchange(CDataExchange* pDX)
 // 메세지맵 (이벤트를 정의)
 BEGIN_MESSAGE_MAP(CMfcStartDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
-	ON_WM_PAINT()
+//	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BTN_TEST, &CMfcStartDlg::OnBnClickedBtnTest)
 	ON_EN_CHANGE(IDC_EDIT_NUM1, &CMfcStartDlg::OnEnChangeEditNum1)
@@ -84,6 +86,7 @@ BEGIN_MESSAGE_MAP(CMfcStartDlg, CDialogEx)
 	ON_WM_ERASEBKGND()
 	ON_WM_DESTROY()
 	ON_BN_CLICKED(IDC_BTN_MODAL, &CMfcStartDlg::OnBnClickedBtnModal)
+	ON_BN_CLICKED(IDC_MODAL_TEST, &CMfcStartDlg::OnBnClickedModalTest)
 END_MESSAGE_MAP()
 
 
@@ -119,11 +122,19 @@ BOOL CMfcStartDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	MoveWindow(0, 0, 1280, 800);
+
 	SetDlgItemText(IDC_STATIC_RESULT, _T("0"));
 	m_pDlgImage = new CDlgImage;	//메모리 해제 필요
 	m_pDlgImage->Create(IDD_CDLGIMAGE, this);
 	m_pDlgImage->ShowWindow(SW_SHOW);
+	m_pDlgImage->MoveWindow(10, 320, 320, 240);
 
+	m_pDlgImageResult = new CDlgImage;	//메모리 해제 필요
+	m_pDlgImageResult->Create(IDD_CDLGIMAGE, this);
+	m_pDlgImageResult->ShowWindow(SW_SHOW);
+	m_pDlgImageResult->MoveWindow(340, 320, 320, 240);
+	
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
 
@@ -137,35 +148,6 @@ void CMfcStartDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	else
 	{
 		CDialogEx::OnSysCommand(nID, lParam);
-	}
-}
-
-// 대화 상자에 최소화 단추를 추가할 경우 아이콘을 그리려면
-//  아래 코드가 필요합니다.  문서/뷰 모델을 사용하는 MFC 애플리케이션의 경우에는
-//  프레임워크에서 이 작업을 자동으로 수행합니다.
-
-void CMfcStartDlg::OnPaint()
-{
-	if (IsIconic())
-	{
-		CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
-
-		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
-
-		// 클라이언트 사각형에서 아이콘을 가운데에 맞춥니다.
-		int cxIcon = GetSystemMetrics(SM_CXICON);
-		int cyIcon = GetSystemMetrics(SM_CYICON);
-		CRect rect;
-		GetClientRect(&rect);
-		int x = (rect.Width() - cxIcon + 1) / 2;
-		int y = (rect.Height() - cyIcon + 1) / 2;
-
-		// 아이콘을 그립니다.
-		dc.DrawIcon(x, y, m_hIcon);
-	}
-	else
-	{
-		CDialogEx::OnPaint();
 	}
 }
 
@@ -291,7 +273,7 @@ void CMfcStartDlg::UpdateDisplay()
 {
 	//이미지 드로우
 	CClientDC dc(this);
-	m_image.Draw(dc, 10, 240 / 2);
+	m_image.Draw(dc, 10, 60);
 }
 
 void CMfcStartDlg::MoveRect()
@@ -482,4 +464,30 @@ void CMfcStartDlg::CallFunction(int n)
 {
 	int nData = n;
 	cout << "modal called data : " << nData << endl;
+}
+
+
+void CMfcStartDlg::OnBnClickedModalTest()
+{	
+	unsigned char* fm = (unsigned char*)m_pDlgImage->m_image.GetBits();
+	int nWidth = m_pDlgImage->m_image.GetWidth();
+	int nHeight = m_pDlgImage->m_image.GetHeight();
+	int nPitch = m_pDlgImage->m_image.GetPitch();
+
+	for (int j = 0; j < nHeight; j++)
+	{
+		int x = rand() % nWidth;
+		fm[j * nPitch + x] = 0;
+	}
+	//count
+	int nCount = 0;
+	for (int j = 0; j < nHeight; j++)
+	{
+		for (int i = 0; i < nWidth; i++) {
+			if (fm[j * nPitch + i] == 0)
+				nCount++;
+		}
+	}
+	cout << "count : " << nCount << endl;
+	m_pDlgImage->Invalidate();
 }
