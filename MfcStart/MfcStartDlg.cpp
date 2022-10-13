@@ -450,6 +450,8 @@ void CMfcStartDlg::OnDestroy()
 		delete m_pBtnOnOff;
 	if (m_pDlgImage != NULL)
 		delete m_pDlgImage;
+	if (m_pDlgImageResult != NULL)
+		delete m_pDlgImageResult;
 }
 
 
@@ -473,21 +475,29 @@ void CMfcStartDlg::OnBnClickedModalTest()
 	int nWidth = m_pDlgImage->m_image.GetWidth();
 	int nHeight = m_pDlgImage->m_image.GetHeight();
 	int nPitch = m_pDlgImage->m_image.GetPitch();
+	memset(fm, 0xff, nWidth * nHeight);
 
-	for (int j = 0; j < nHeight; j++)
+	for (int j = 0; j < 100; j++)
 	{
 		int x = rand() % nWidth;
-		fm[j * nPitch + x] = 0;
+		int y = rand() % nHeight;
+		fm[y * nPitch + x] = 0;
 	}
+
 	//count
-	int nCount = 0;
+	int nIndex = 0;
 	for (int j = 0; j < nHeight; j++)
 	{
 		for (int i = 0; i < nWidth; i++) {
-			if (fm[j * nPitch + i] == 0)
-				nCount++;
+			if (fm[j * nPitch + i] == 0) {
+				//m_pDlgImageResult[m_pDlgImageResult->m_nDataCount].m_ptData
+				m_pDlgImageResult->m_ptData[nIndex].x = i;
+				m_pDlgImageResult->m_ptData[nIndex].y = j;
+				m_pDlgImageResult->m_nDataCount = nIndex++;
+			}
 		}
 	}
-	cout << "count : " << nCount << endl;
+
 	m_pDlgImage->Invalidate();
+	m_pDlgImageResult->Invalidate();
 }
