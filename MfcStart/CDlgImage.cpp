@@ -1,7 +1,7 @@
 ﻿// CDlgImage.cpp: 구현 파일
 //
 
-#include "pch.h"
+#include "pch.h"	//이전버전의 stdafx.h
 #include "MfcStart.h"
 #include "afxdialogex.h"
 #include "CDlgImage.h"
@@ -92,7 +92,7 @@ void CDlgImage::drawData(CDC* pDC)
 {
 	CRect rect;
 	CPen pen; 
-	pen.CreatePen(PS_SOLID, 1, RGB(0xff,0,0));
+	pen.CreatePen(PS_SOLID, 1, COLOR_RED);
 	CPen* pOldPen = pDC->SelectObject(&pen);	//기존 펜 저장
 	for (int i = 0; i < m_nDataCount; i++) {
 		rect.SetRect(m_ptData[i], m_ptData[i]);

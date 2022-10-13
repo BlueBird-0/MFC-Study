@@ -360,7 +360,7 @@ void CMfcStartDlg::MoveCircle()
 
 void CMfcStartDlg::OnBnClickedBtnAction()
 {
-	for (size_t i = 0; i < 100; i++)
+	for (size_t i = 0; i < MAX_POINT; i++)
 	{
 		MoveRect();
 		MoveCircle();
@@ -475,13 +475,14 @@ void CMfcStartDlg::OnBnClickedModalTest()
 	int nWidth = m_pDlgImage->m_image.GetWidth();
 	int nHeight = m_pDlgImage->m_image.GetHeight();
 	int nPitch = m_pDlgImage->m_image.GetPitch();
-	memset(fm, 0xff, nWidth * nHeight);
+	memset(fm, 0, nWidth * nHeight);
 
-	for (int j = 0; j < 100; j++)
+	for (int j = 0; j < MAX_POINT; j++)
 	{
 		int x = rand() % nWidth;
 		int y = rand() % nHeight;
-		fm[y * nPitch + x] = 0;
+		int bright = rand() % 0xff;
+		fm[y * nPitch + x] = bright;
 	}
 
 	//count
@@ -489,7 +490,7 @@ void CMfcStartDlg::OnBnClickedModalTest()
 	for (int j = 0; j < nHeight; j++)
 	{
 		for (int i = 0; i < nWidth; i++) {
-			if (fm[j * nPitch + i] == 0) {
+			if (fm[j * nPitch + i] != 0) {
 				//m_pDlgImageResult[m_pDlgImageResult->m_nDataCount].m_ptData
 				m_pDlgImageResult->m_ptData[nIndex].x = i;
 				m_pDlgImageResult->m_ptData[nIndex].y = j;
