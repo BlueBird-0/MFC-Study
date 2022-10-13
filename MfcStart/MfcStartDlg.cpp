@@ -87,6 +87,7 @@ BEGIN_MESSAGE_MAP(CMfcStartDlg, CDialogEx)
 	ON_WM_DESTROY()
 	ON_BN_CLICKED(IDC_BTN_MODAL, &CMfcStartDlg::OnBnClickedBtnModal)
 	ON_BN_CLICKED(IDC_MODAL_TEST, &CMfcStartDlg::OnBnClickedModalTest)
+	ON_BN_CLICKED(IDC_BTN_PROCESS, &CMfcStartDlg::OnBnClickedBtnProcess)
 END_MESSAGE_MAP()
 
 
@@ -483,6 +484,7 @@ void CMfcStartDlg::OnBnClickedModalTest()
 		int y = rand() % nHeight;
 		int bright = rand() % 0xff;
 		fm[y * nPitch + x] = bright;
+
 	}
 
 	//count
@@ -501,4 +503,20 @@ void CMfcStartDlg::OnBnClickedModalTest()
 
 	m_pDlgImage->Invalidate();
 	m_pDlgImageResult->Invalidate();
+}
+
+#include "CProcess.h"
+#include <chrono>	//프로세스 시간 관리하기 위한 기능
+void CMfcStartDlg::OnBnClickedBtnProcess()
+{
+	CProcess process;
+
+	auto start = std::chrono::system_clock::now();	//auto : 지연선언
+
+	int nRet = process.getStarInfo(&m_pDlgImage->m_image);
+
+	auto end = std::chrono::system_clock::now();
+	auto millisec = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+	cout << "process.getStarInfo : " << nRet << endl;
+	cout << "처리시간 : " << millisec.count()<<"ms" << endl;
 }

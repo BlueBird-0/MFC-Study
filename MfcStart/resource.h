@@ -24,6 +24,7 @@
 #define IDC_BTN_ONOFF                   1009
 #define IDC_BTN_MODAL                   1011
 #define IDC_BUTTON1                     1012
+#define IDC_BTN_PROCESS                 1012
 #define IDC_BTN_SEND_DATA               1013
 #define IDC_MODAL_TEST                  1014
 

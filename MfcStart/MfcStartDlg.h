@@ -67,4 +67,5 @@ public:
 	afx_msg void OnBnClickedBtnModal();
 	void CallFunction(int n);
 	afx_msg void OnBnClickedModalTest();
+	afx_msg void OnBnClickedBtnProcess();
 };
