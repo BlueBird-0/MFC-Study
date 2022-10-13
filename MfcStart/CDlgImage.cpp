@@ -105,11 +105,11 @@ void CDlgImage::drawData(CDC* pDC)
 	//원의 외곽 찾기
 	//pen.CreatePen(PS_SOLID, 1, COLOR_YELLOW);
 	pen.CreatePen(PS_SOLID, 1, COLOR_GREEN);
-	pDC->SelectObject(&pen);
-
-	if (m_bChkOutLine) {
-		pDC->Ellipse(m_cCenter.x - m_nRadius, m_cCenter.y - m_nRadius, m_cCenter.x + m_nRadius, m_cCenter.y + m_nRadius);
+	for (int i = 0; i < m_nOutlineCount; i++) {
+		//rect.SetRect(m_ptOutline[i], m_ptOutline[i]);
+		pDC->SetPixel(m_ptOutline[i], COLOR_GREEN);
 	}
+	pDC->SelectObject(&pen);
 	pen.DeleteObject();
 
 	//무게중심에 십자가 그리기

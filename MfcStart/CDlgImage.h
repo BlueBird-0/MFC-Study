@@ -3,6 +3,7 @@
 #include "CDoublePoint.h"
 
 #define MAX_POINT 150
+#define MAX_OUTLINE_POINT 320*240
 // CDlgImage 대화 상자
 
 class CDlgImage : public CDialogEx
@@ -13,10 +14,9 @@ public:
 	CDlgImage(CWnd* pParent = nullptr);   // 표준 생성자입니다.
 	virtual ~CDlgImage();
 
+	CPoint m_ptOutline[MAX_OUTLINE_POINT];	//외곽선 데이터
+	int m_nOutlineCount = 0;
 	CDoublePoint m_cCenterOfGravity;	//원의 무게중심
-	BOOL m_bChkOutLine = FALSE;	//외곽선 출력 체크
-	CPoint m_cCenter;	//원의중심
-	int m_nRadius;	//원의 반지름
 	CImage m_image;
 	CWnd* m_pParent;	//부모윈도우
 	int m_nDataCount = 0;

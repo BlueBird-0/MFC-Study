@@ -607,7 +607,6 @@ void CMfcStartDlg::OnBnClickedBtnCircleMake()
 {
 	DrawRandomCircle();
 	CDoublePoint cCenterOfGravity = FindCenterOfGravity(&m_pDlgImageCircle->m_image);
-	m_pDlgImageCircleResult->m_bChkOutLine = TRUE;
 	DrawCircleResult(cCenterOfGravity);
 }
 
@@ -640,43 +639,65 @@ void CMfcStartDlg::DrawRandomCircle() {
 	m_pDlgImageCircle->Invalidate();
 }
 
-CRect CMfcStartDlg::FindCircleOutLine()
-{
-	CPoint cLeftTop(INT_MAX, INT_MAX);
-	CPoint cRightBottom(INT_MIN, INT_MIN);
 
+int out[240][320];	//필터적용할 output
+void CMfcStartDlg::FindCircleOutLine()
+{
+	//윤곽선 필터로 사용할 변형 라플라시안 edge detection 사용
+	int mask1[3][3] = {
+		1, 1, 1,
+		1, 150, 1,
+		1, 1, 1
+	};
+	int sum;
 	unsigned char* fm = (unsigned char*)m_pDlgImageCircle->m_image.GetBits();
 	int nWidth = m_pDlgImageCircle->m_image.GetWidth();
 	int nHeight = m_pDlgImageCircle->m_image.GetHeight();
 	int nPitch = m_pDlgImageCircle->m_image.GetPitch();
-	for (int j = 0; j < nHeight; j++)
+	//패딩 없이 작업 
+	for (int j = 1; j < nHeight-1; j++)
 	{
-		for (int i = 0; i < nWidth; i++)
+		for (int i = 1; i < nWidth-1; i++)
 		{
-			if (fm[j * nPitch + i] != 0)
+			sum =  0;
+			for (int m = -1; m <= 1; m++)
 			{
-				if (i < cLeftTop.x)
-					cLeftTop.x = i;
-				if (i > cRightBottom.x)
-					cRightBottom.x = i;
-				if (j < cLeftTop.y)
-					cLeftTop.y = j;
-				if (j > cRightBottom.y)
-					cRightBottom.y = j;
+				for (int n = -1; n <= 1; n++)
+				{
+					sum += fm[(j+m)*nPitch+ (i+n)] * mask1[m + 1][n + 1];
+				}
 			}
+			//출력
+			out[j][i] = sum;
 		}
 	}
-
-	return CRect(cLeftTop.x, cLeftTop.y, cRightBottom.x, cRightBottom.y);
 }
 
 void CMfcStartDlg::DrawCircleResult(CDoublePoint cCenterOfGravity) {
 	//무게중심 가운데 십자마크 그리기
 	m_pDlgImageCircleResult->m_cCenterOfGravity = cCenterOfGravity;
-	//원 외곽선 그리기
-	CRect cOutLineRect = FindCircleOutLine();
-	m_pDlgImageCircleResult->m_nRadius = cOutLineRect.Width() / 2;
-	m_pDlgImageCircleResult->m_cCenter = cOutLineRect.CenterPoint();
 	
+	
+	//원 외곽선 그리기
+	FindCircleOutLine();
+	int nWidth = m_pDlgImageCircleResult->m_image.GetWidth();
+	int nHeight = m_pDlgImageCircleResult->m_image.GetHeight();
+	
+	int nCount = 0;
+	for (int j = 0; j < nHeight; j++)
+	{
+		for (int i = 0; i < nWidth; i++)
+		{	
+			if (out[j][i] < 255 && out[j][i]!=0) {
+				//fm[j * nPitch + i] = out[j][i];
+				if (nCount < MAX_OUTLINE_POINT) {
+					m_pDlgImageCircleResult->m_ptOutline[nCount].x = i;
+					m_pDlgImageCircleResult->m_ptOutline[nCount].y = j;
+					m_pDlgImageCircleResult->m_nOutlineCount = nCount++;
+				}
+			}
+		}
+	}
+
 	m_pDlgImageCircleResult->Invalidate();
 }
