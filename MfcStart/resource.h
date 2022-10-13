@@ -26,7 +26,9 @@
 #define IDC_BUTTON1                     1012
 #define IDC_BTN_PROCESS                 1012
 #define IDC_BTN_SEND_DATA               1013
+#define IDC_BTN_MAKE_PATTERN            1013
 #define IDC_MODAL_TEST                  1014
+#define IDC_BTN_GET_DATA                1015
 
 // Next default values for new objects
 // 

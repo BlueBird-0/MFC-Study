@@ -88,6 +88,8 @@ BEGIN_MESSAGE_MAP(CMfcStartDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_MODAL, &CMfcStartDlg::OnBnClickedBtnModal)
 	ON_BN_CLICKED(IDC_MODAL_TEST, &CMfcStartDlg::OnBnClickedModalTest)
 	ON_BN_CLICKED(IDC_BTN_PROCESS, &CMfcStartDlg::OnBnClickedBtnProcess)
+	ON_BN_CLICKED(IDC_BTN_MAKE_PATTERN, &CMfcStartDlg::OnBnClickedBtnMakePattern)
+	ON_BN_CLICKED(IDC_BTN_GET_DATA, &CMfcStartDlg::OnBnClickedBtnGetData)
 END_MESSAGE_MAP()
 
 
@@ -519,4 +521,56 @@ void CMfcStartDlg::OnBnClickedBtnProcess()
 	auto millisec = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 	cout << "process.getStarInfo : " << nRet << endl;
 	cout << "처리시간 : " << millisec.count()<<"ms" << endl;
+}
+
+
+void CMfcStartDlg::OnBnClickedBtnMakePattern()
+{
+	unsigned char* fm = (unsigned char*)m_pDlgImage->m_image.GetBits();
+	int nWidth = m_pDlgImage->m_image.GetWidth();
+	int nHeight = m_pDlgImage->m_image.GetHeight();
+	int nPitch = m_pDlgImage->m_image.GetPitch();
+	memset(fm, 0, nWidth * nHeight);
+
+	CRect rect(50, 50, 70, 200);
+	for (int j = rect.top; j < rect.bottom; j++)
+	{
+		for (int i = rect.left; i < rect.right; i++)
+		{
+			fm[j * nPitch + i] = rand()%0xff;
+		}
+	}
+	m_pDlgImage->Invalidate();
+}
+
+
+void CMfcStartDlg::OnBnClickedBtnGetData()
+{
+	unsigned char* fm = (unsigned char*)m_pDlgImage->m_image.GetBits();
+	int nWidth = m_pDlgImage->m_image.GetWidth();
+	int nHeight = m_pDlgImage->m_image.GetHeight();
+	int nPitch = m_pDlgImage->m_image.GetPitch();
+
+	int nTh = 100;
+	CRect rect(0, 0, nWidth, nHeight);
+	int nSumX = 0;
+	int nSumY = 0;
+	int nCount = 0;
+
+	for (int j = rect.top; j < rect.bottom; j++)
+	{
+		for (int i = rect.left; i < rect.right; i++)
+		{
+			if (fm[j * nPitch + i] > nTh) {
+				nSumX += i;
+				nSumY += j;
+				nCount++;
+			}
+		}
+	}
+
+	double dCenterX = (double)nSumX / nCount;	//double형변환
+	double dCenterY = (double)nSumY / nCount;
+
+	cout << dCenterX << "\t" << dCenterY << endl;
 }
