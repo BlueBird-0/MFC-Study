@@ -8,6 +8,7 @@
 #include "MfcStartDlg.h"
 #include "afxdialogex.h"
 #include <iostream>
+#include <tuple>
 using namespace std;
 
 #ifdef _DEBUG
@@ -58,7 +59,7 @@ END_MESSAGE_MAP()
 
 CMfcStartDlg::CMfcStartDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_MFCSTART_DIALOG, pParent)
-	, m_nNum1(0), m_nNum2(0)
+	, m_nNum1(0), m_nNum2(0), m_nCircleSize(CIRCLE_SIZE)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -68,12 +69,12 @@ void CMfcStartDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_EDIT_NUM1, m_nNum1);
 	DDX_Text(pDX, IDC_EDIT_NUM2, m_nNum2);
+	DDX_Text(pDX, IDC_EDIT_CIRCLE_SIZE, m_nCircleSize);
 }
 
 // 메세지맵 (이벤트를 정의)
 BEGIN_MESSAGE_MAP(CMfcStartDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
-//	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BTN_TEST, &CMfcStartDlg::OnBnClickedBtnTest)
 	ON_EN_CHANGE(IDC_EDIT_NUM1, &CMfcStartDlg::OnEnChangeEditNum1)
@@ -90,6 +91,7 @@ BEGIN_MESSAGE_MAP(CMfcStartDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_PROCESS, &CMfcStartDlg::OnBnClickedBtnProcess)
 	ON_BN_CLICKED(IDC_BTN_MAKE_PATTERN, &CMfcStartDlg::OnBnClickedBtnMakePattern)
 	ON_BN_CLICKED(IDC_BTN_GET_DATA, &CMfcStartDlg::OnBnClickedBtnGetData)
+	ON_BN_CLICKED(IDC_BTN_CIRCLE_MAKE, &CMfcStartDlg::OnBnClickedBtnCircleMake)
 END_MESSAGE_MAP()
 
 
@@ -125,7 +127,7 @@ BOOL CMfcStartDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
 	// TODO: 여기에 추가 초기화 작업을 추가합니다.
-	MoveWindow(0, 0, 1280, 800);
+	MoveWindow(0, 0, 880, 950);
 
 	SetDlgItemText(IDC_STATIC_RESULT, _T("0"));
 	m_pDlgImage = new CDlgImage;	//메모리 해제 필요
@@ -138,6 +140,8 @@ BOOL CMfcStartDlg::OnInitDialog()
 	m_pDlgImageResult->ShowWindow(SW_SHOW);
 	m_pDlgImageResult->MoveWindow(340, 320, 320, 240);
 	
+	//4-8과제 코드
+	InitCircleDlg();
 	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
 }
 
@@ -348,7 +352,7 @@ void CMfcStartDlg::MoveCircle()
 			int nPx = nCenterX + i;
 			int nPy = nCenterY + j;
 			//if(pow(nPx-nCenterX,2)+pow(nPy-nCenterY,2) < pow(r, 2))
-			if (ValidInCirclePos(nCenterX, nCenterY, nPx, nPy, r))
+			if (ValidInCirclePos(nCenterX, nCenterY, nPx, nPy, r, &m_image))
 			{
 				fm[(nCenterY + j) * nPitch + (nCenterX + i)] = 150;
 			}
@@ -381,9 +385,9 @@ BOOL CMfcStartDlg::ValidImgPos(int x, int y)
 	return rect.PtInRect(CPoint(x, y));
 }
 
-BOOL CMfcStartDlg::ValidInCirclePos(int x, int y, int p1, int p2, int r) {
-	int nWidth = m_image.GetWidth();
-	int nHeight = m_image.GetHeight();
+BOOL CMfcStartDlg::ValidInCirclePos(int x, int y, int p1, int p2, int r, CImage* cImage) {
+	int nWidth = cImage->GetWidth();
+	int nHeight = cImage->GetHeight();
 	//밖으로 나갔을 때 처리
 	if (p1 < 0 || p2 < 0 || p1 >= nWidth || p2 >= nHeight)
 		return false;
@@ -455,6 +459,10 @@ void CMfcStartDlg::OnDestroy()
 		delete m_pDlgImage;
 	if (m_pDlgImageResult != NULL)
 		delete m_pDlgImageResult;
+	if (m_pDlgImageCircle != NULL)
+		delete m_pDlgImageCircle;
+	if (m_pDlgImageCircleResult != NULL)
+		delete m_pDlgImageCircleResult;
 }
 
 
@@ -546,12 +554,17 @@ void CMfcStartDlg::OnBnClickedBtnMakePattern()
 
 void CMfcStartDlg::OnBnClickedBtnGetData()
 {
-	unsigned char* fm = (unsigned char*)m_pDlgImage->m_image.GetBits();
-	int nWidth = m_pDlgImage->m_image.GetWidth();
-	int nHeight = m_pDlgImage->m_image.GetHeight();
-	int nPitch = m_pDlgImage->m_image.GetPitch();
+	FindCenterOfGravity(&m_pDlgImage->m_image);
+}
 
-	int nTh = 100;
+//nTh 보다 큰 값의 무게중심 구함
+CDoublePoint CMfcStartDlg::FindCenterOfGravity(CImage* pImage, int nTh)
+{
+	unsigned char* fm = (unsigned char*)pImage->GetBits();
+	int nWidth = pImage->GetWidth();
+	int nHeight = pImage->GetHeight();
+	int nPitch = pImage->GetPitch();
+
 	CRect rect(0, 0, nWidth, nHeight);
 	int nSumX = 0;
 	int nSumY = 0;
@@ -573,4 +586,64 @@ void CMfcStartDlg::OnBnClickedBtnGetData()
 	double dCenterY = (double)nSumY / nCount;
 
 	cout << dCenterX << "\t" << dCenterY << endl;
+	return CDoublePoint(dCenterX, dCenterY);
+}
+
+
+void CMfcStartDlg::InitCircleDlg() {
+	//4-8 과제수행 코드
+	m_pDlgImageCircle = new CDlgImage;	//메모리 해제 필요
+	m_pDlgImageCircle->Create(IDD_CDLGIMAGE, this);
+	m_pDlgImageCircle->ShowWindow(SW_SHOW);
+	m_pDlgImageCircle->MoveWindow(30, 600, 320, 240);
+
+	m_pDlgImageCircleResult = new CDlgImage;	//메모리 해제 필요
+	m_pDlgImageCircleResult->Create(IDD_CDLGIMAGE, this);
+	m_pDlgImageCircleResult->ShowWindow(SW_SHOW);
+	m_pDlgImageCircleResult->MoveWindow(360, 600, 320, 240);
+}
+
+void CMfcStartDlg::OnBnClickedBtnCircleMake()
+{
+	DrawRandomCircle();
+	CDoublePoint cCenterOfGravity = FindCenterOfGravity(&m_pDlgImageCircle->m_image);
+	DrawCircleResult(cCenterOfGravity);
+}
+
+void CMfcStartDlg::DrawRandomCircle() {
+	unsigned char* fm = (unsigned char*)m_pDlgImageCircle->m_image.GetBits();
+	int nWidth = m_pDlgImageCircle->m_image.GetWidth();
+	int nHeight = m_pDlgImageCircle->m_image.GetHeight();
+	int nPitch = m_pDlgImageCircle->m_image.GetPitch();
+	memset(fm, 0, nWidth * nHeight);
+
+	int nCenterX = rand() % nWidth;
+	int nCenterY = rand() % nHeight;
+
+	//'IDC_EDIT_CIRCLE_SIZE'값 가져오기
+	UpdateData();
+	int r = m_nCircleSize;
+	//X, Y에 원 그리기(x - a)2 + (y - b)2 = r2
+	for (int j = -r; j < +r; j++)
+	{
+		for (int i = -r; i < +r; i++)
+		{
+			int nPx = nCenterX + i;
+			int nPy = nCenterY + j;
+			if (ValidInCirclePos(nCenterX, nCenterY, nPx, nPy, r, &m_pDlgImageCircle->m_image))
+			{
+				fm[(nCenterY + j) * nPitch + (nCenterX + i)] = rand()%0xff;
+			}
+		}
+	}
+	m_pDlgImageCircle->Invalidate();
+}
+
+void CMfcStartDlg::DrawCircleResult(CDoublePoint cCenterOfGravity) {
+	//무게중심 가운데 십자마크 그리기
+	m_pDlgImageCircleResult->cCenterOfGravity = cCenterOfGravity;
+	m_pDlgImageCircleResult->Invalidate();
+
+	//외곽에 노란색 선 그리기
+	
 }

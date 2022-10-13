@@ -99,5 +99,17 @@ void CDlgImage::drawData(CDC* pDC)
 		rect.InflateRect(5, 5);
 		pDC->Ellipse(rect);
 	}
+
+
+	//무게중심에 십자가 그리기
+	CPoint point = CPoint(cCenterOfGravity.d_x, cCenterOfGravity.d_y);
+	int nCrossSize = CROSS_SIZE;
+	pDC->MoveTo(point.x - nCrossSize, point.y);
+	pDC->LineTo(point.x + nCrossSize, point.y);
+	pDC->MoveTo(point.x, point.y + nCrossSize);
+	pDC->LineTo(point.x, point.y - nCrossSize);
+
+	//원의 외곽 찾기
+	//예정
 	pDC->SelectObject(pOldPen);	//기존 펜 불러오기
 }

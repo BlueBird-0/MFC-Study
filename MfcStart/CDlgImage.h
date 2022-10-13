@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "afxdialogex.h"
+#include "CDoublePoint.h"
 
 #define MAX_POINT 150
 // CDlgImage 대화 상자
@@ -12,6 +13,7 @@ public:
 	CDlgImage(CWnd* pParent = nullptr);   // 표준 생성자입니다.
 	virtual ~CDlgImage();
 
+	CDoublePoint cCenterOfGravity;	//원의 무게중심
 	CImage m_image;
 	CWnd* m_pParent;	//부모윈도우
 	int m_nDataCount = 0;

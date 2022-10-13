@@ -184,6 +184,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CDlgImage.h" />
+    <ClInclude Include="CDoublePoint.h" />
     <ClInclude Include="CProcess.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="MfcStart.h" />
@@ -194,6 +195,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CDlgImage.cpp" />
+    <ClCompile Include="CDoublePoint.cpp" />
     <ClCompile Include="CProcess.cpp" />
     <ClCompile Include="MfcStart.cpp" />
     <ClCompile Include="MfcStartDlg.cpp" />

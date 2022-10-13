@@ -1,4 +1,4 @@
-﻿#pragma once
+﻿#pragma onces
 
 // CProcess 명령 대상
 

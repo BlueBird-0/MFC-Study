@@ -7,8 +7,10 @@
 #ifndef PCH_H
 #define PCH_H
 #define COLOR_RED RGB(0xff, 0, 0)
-#define COLOR_GREEN RGB(0, 0xff, 0);
-#define COLOR_BLUE RGB(0, 0, 0xff);
+#define COLOR_GREEN RGB(0, 0xff, 0)
+#define COLOR_BLUE RGB(0, 0, 0xff)
+#define CIRCLE_SIZE 20
+#define CROSS_SIZE 10
 
 // 여기에 미리 컴파일하려는 헤더 추가
 #include "framework.h"
