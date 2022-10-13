@@ -13,7 +13,10 @@ public:
 	CDlgImage(CWnd* pParent = nullptr);   // 표준 생성자입니다.
 	virtual ~CDlgImage();
 
-	CDoublePoint cCenterOfGravity;	//원의 무게중심
+	CDoublePoint m_cCenterOfGravity;	//원의 무게중심
+	BOOL m_bChkOutLine = FALSE;	//외곽선 출력 체크
+	CPoint m_cCenter;	//원의중심
+	int m_nRadius;	//원의 반지름
 	CImage m_image;
 	CWnd* m_pParent;	//부모윈도우
 	int m_nDataCount = 0;

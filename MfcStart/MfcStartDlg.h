@@ -42,6 +42,7 @@ private:
 	void DrawRandomCircle();
 	void DrawCircleResult(CDoublePoint cCenterOfGravity);
 	CDoublePoint FindCenterOfGravity(CImage* pImage, int nTh=100);
+	CRect FindCircleOutLine();
 
 // 구현입니다.
 protected:

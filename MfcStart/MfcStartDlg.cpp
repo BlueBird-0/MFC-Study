@@ -607,6 +607,7 @@ void CMfcStartDlg::OnBnClickedBtnCircleMake()
 {
 	DrawRandomCircle();
 	CDoublePoint cCenterOfGravity = FindCenterOfGravity(&m_pDlgImageCircle->m_image);
+	m_pDlgImageCircleResult->m_bChkOutLine = TRUE;
 	DrawCircleResult(cCenterOfGravity);
 }
 
@@ -639,11 +640,43 @@ void CMfcStartDlg::DrawRandomCircle() {
 	m_pDlgImageCircle->Invalidate();
 }
 
+CRect CMfcStartDlg::FindCircleOutLine()
+{
+	CPoint cLeftTop(INT_MAX, INT_MAX);
+	CPoint cRightBottom(INT_MIN, INT_MIN);
+
+	unsigned char* fm = (unsigned char*)m_pDlgImageCircle->m_image.GetBits();
+	int nWidth = m_pDlgImageCircle->m_image.GetWidth();
+	int nHeight = m_pDlgImageCircle->m_image.GetHeight();
+	int nPitch = m_pDlgImageCircle->m_image.GetPitch();
+	for (int j = 0; j < nHeight; j++)
+	{
+		for (int i = 0; i < nWidth; i++)
+		{
+			if (fm[j * nPitch + i] != 0)
+			{
+				if (i < cLeftTop.x)
+					cLeftTop.x = i;
+				if (i > cRightBottom.x)
+					cRightBottom.x = i;
+				if (j < cLeftTop.y)
+					cLeftTop.y = j;
+				if (j > cRightBottom.y)
+					cRightBottom.y = j;
+			}
+		}
+	}
+
+	return CRect(cLeftTop.x, cLeftTop.y, cRightBottom.x, cRightBottom.y);
+}
+
 void CMfcStartDlg::DrawCircleResult(CDoublePoint cCenterOfGravity) {
 	//무게중심 가운데 십자마크 그리기
-	m_pDlgImageCircleResult->cCenterOfGravity = cCenterOfGravity;
-	m_pDlgImageCircleResult->Invalidate();
-
-	//외곽에 노란색 선 그리기
+	m_pDlgImageCircleResult->m_cCenterOfGravity = cCenterOfGravity;
+	//원 외곽선 그리기
+	CRect cOutLineRect = FindCircleOutLine();
+	m_pDlgImageCircleResult->m_nRadius = cOutLineRect.Width() / 2;
+	m_pDlgImageCircleResult->m_cCenter = cOutLineRect.CenterPoint();
 	
+	m_pDlgImageCircleResult->Invalidate();
 }
